@@ -57,7 +57,8 @@ from sklearn.metrics import classification_report
 np.random.seed(0)
 ```
 
-Next let's load the dataset.  
+Next the dataset is loaded and prepared for modeling in three ways: (1) scale down the greyscale, (2) shuffle the dataset, and (3) split into train, test, and dev.
+
 
 ```python
 # Load the digit data from https://www.openml.org/d/554 or from default local location '~/scikit_learn_data/...'
@@ -82,7 +83,7 @@ train_data, train_labels = X[:60000], Y[:60000]
 mini_train_data, mini_train_labels = X[:1000], Y[:1000]
 ```
 
-To get a sense of the dataset, the handwritten digit images will be visualized with the imshow() function.  
+To get a sense of the dataset, the handwritten digit images are visualized with the imshow() function.  
 
 ```python
 examples = 10
@@ -101,6 +102,10 @@ for i in range(examples):
         axs[j][i].imshow(num_image)
         axs[j][i].axis("off")
 ```
+
+![10 examples of the handwritten digits from the MNIST dataset](https://github.com/sli0111/MNIST/blob/gh-pages/MNIST%20handwritten%20digits.png)
+
+
 
 ### References
 https://sli0111.github.io/k-nearest-neighbors/
