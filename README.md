@@ -25,7 +25,7 @@ The inference problem is:
 
 MNIST is a large dataset of handwritten images often used for image processing models.  The dataset contains over 60,000 images of 28x28 pixels.  
 
-<img src="https://en.wikipedia.org/wiki/MNIST_database#/media/File:MnistExamples.png">
+![dfd](https://en.wikipedia.org/wiki/MNIST_database#/media/File:MnistExamples.png)
 
 ### How does KNN work?
 
