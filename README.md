@@ -5,9 +5,8 @@ November 22, 2020
 
 * Introduction
 * What is the MNIST dataset?
-* Classification models: KNN, Naive Bayes, and Logistic
-* Code
-* Challenges
+* A Quick Review of KNN
+* Digit Classification in Code and Three techniques to improve KNN 
 * Summary
 
 ### Introduction
@@ -21,14 +20,14 @@ The inference problem is:
 
 <img src="https://render.githubusercontent.com/render/math?math=X = y(x))">
 
-### What is MNIST? 
+### What is MNIST dataset? 
 
 MNIST is a large dataset of handwritten images often used for image processing models.  The dataset contains over 60,000 images of 28x28 pixels.  
 
 ![dfd](https://en.wikipedia.org/wiki/MNIST_database#/media/File:MnistExamples.png)
 
 
-### A Quick Review of KNN, Naive Bayes, and Logistic Regression
+### A Quick Review of KNN
 
 
 
@@ -237,7 +236,87 @@ plt.show
 
 ![accuracy vs train size and inference time](knn train size.png)
 
+Since high computational inference times are often inhibitive in practice, another technique to improve accuracy is Gaussian Blur.  Gaussian Blue is an common image processing technique that smooths an image by blurring.  The idea is that a value of a particular pixel is a weighted average of the pixels around it.  The weight of surrounding pixels on the particular pixel is determined by the Gaussian function (mean and variance).  Ultimately, the technique reduces the complexity of the images and very localized variance and generalizes the model.
+
+The script below builts a function called gaussian_blur which averages the 8 neighboring pixels and assigns that value to the particular pixel.  Two KNN models are then produced, one for the raw dataset and another for the transformed train dataset.  From the results, we can see the the accuracy of the now has now increased to 91%.
+
+```python
+def gaussian_blur(data):
+    '''
+    data = a 2D np.array
+    '''
+    
+    # Initialize new array to accept the filtered data
+    examples = data.shape[0]
+    pixels = data.shape[1]
+    g_data = np.zeros([examples, pixels])
+    
+    # Iterate through every row in the dataset and calculate the average pixel value
+    for k in range(examples):
+        num_image = np.reshape(data[k], (28,28))    # Each row of 784 pixels is converted to 28x28
+    
+        new_num_image = np.zeros([28, 28])          # Temporarily store new pixel values
+
+        # Index values are used to find the 8 surrouding pixels around center pixel (i,j)
+        for i in range(1, 27):                      # Index values range from (1,27) to ignore edges
+            for j in range(1, 27):
+                new_num_image[i, j] = 1/9*np.sum([num_image[i, j], num_image[i, j-1], num_image[i,j+1], 
+                                             num_image[i-1, j-1], num_image[i-1, j], num_image[i-1, j+1], 
+                                             num_image[i+1, j-1], num_image[i+1, j], num_image[i+1, j+1]])
+        
+        # Store the filtered pixels into the new array
+        g_data[k] = new_num_image.reshape(pixels)
+    
+    return g_data
+
+# Example of Gaussian Blur on mini_train_data set
+fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(12,5))
+
+gb_mini_train_data = gaussian_blur(mini_train_data)
+gb_dev_data = gaussian_blur(dev_data)
+
+ax1.imshow(mini_train_data[0].reshape(28,28))
+ax1.set_title("No Filter")
+
+ax2.imshow(gb_mini_train_data[0].reshape(28, 28))
+ax2.set_title("Filtered - average pixels")
+plt.show
+
+# Peform kNN for the 4 scenarios for k=1
+
+KNN_0 = KNeighborsClassifier(n_neighbors = 1)
+model_0 = KNN_0.fit(mini_train_data, mini_train_labels)
+accuracy_0 = model_0.score(dev_data, dev_labels)
+
+KNN_1 = KNeighborsClassifier(n_neighbors = 1)
+model_1 = KNN_1.fit(gb_mini_train_data, mini_train_labels)
+accuracy_1 = model_1.score(dev_data, dev_labels)
+
+KNN_2 = KNeighborsClassifier(n_neighbors = 1)
+model_2 = KNN_2.fit(mini_train_data, mini_train_labels)
+accuracy_2 = model_2.score(gb_dev_data, dev_labels)
+
+KNN_3 = KNeighborsClassifier(n_neighbors = 1)
+model_3 = KNN_3.fit(gb_mini_train_data, mini_train_labels)
+accuracy_3 = model_3.score(gb_dev_data, dev_labels)
+
+print("No Filter Train, No Filter Dev: %0.2f" %accuracy_0)
+print("Filter Train, No Filter Dev: %0.2f" %accuracy_1)
+```
+
+```python
+No Filter Train, No Filter Dev: 0.88
+Filter Train, No Filter Dev: 0.91
+```
+
+![exmaple of handwritten digit before and after gaussian blur](gaussian_blur.png)
+
+### Summary
+
+In this guide, we looked at the MNIST handwritten digit dataset and how we could apply a K-Nearest Neighbors classification from sklearn library to classify the digit images.  Out of the box, KNN produced an accuracy of 88% with k=1 and increasing k did not improve model performance.  We increased the training set size for the KNN model and saw increased accuracy but it was at the cost of a high computational inference time.  Instead, applying an image processing technique called Gaussian Blur generalized the model and improved model accuracy to 91% with little cost.  
+
 ### References
-https://sli0111.github.io/k-nearest-neighbors/
+[KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html)
+
 
 
