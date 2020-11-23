@@ -133,7 +133,7 @@ With an accuracy of 88%, its not bad!  Let's take a look at which digits KNN how
 
 The following script grabs the confusion matrix for a KNN model where k=1.  The x and y axis of the confusion matrix represents predicted digits vs labeld digits from the dev set.  The diagonal of the confusion matrix represent the number of times the model was correct and the off diagonals represents where the model predicted incorrectly.  The most incorrect predictions come from when a dev example was a *4* but was labeled as a *9*.
 
-``python
+```python
 # 1-Nearest Neighbor model and produce confusion matrix                 
 model = KNeighborsClassifier(n_neighbors = 1)               
 model.fit(mini_train_data, mini_train_labels)               
