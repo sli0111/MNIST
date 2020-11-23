@@ -30,11 +30,11 @@ The KNN algorithm works by comparing new datasets with those the model was fitte
 
 If L is the distance metric and X = (x_1, x_2) are two points on a 2-D plane, then L is defined as:
 
-<img src="https://render.githubusercontent.com/render/math?math=L = |x_1, x_2|">
+<img src="https://render.githubusercontent.com/render/math?math=L^2 = \sqrt{x_1^2 + x_2^2}">
 
 In higher dimensions, the distance metric is generalized to a term called the L-norm and is written as:
 
-<img src="https://render.githubusercontent.com/render/math?math=L^n = \sqrt(x_1^2 - x_2^2)">
+<img src="https://render.githubusercontent.com/render/math?math=L^n = (\sum{x^n})^{1/n}">
 
 When n=2, the L-norm is when we have two features X = (X1, X2) as presented above.
 
