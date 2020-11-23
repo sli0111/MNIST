@@ -108,7 +108,7 @@ for i in range(examples):
         axs[j][i].axis("off")
 ```
 
-![10 examples of the handwritten digits from the MNIST dataset](https://github.com/sli0111/MNIST/blob/gh-pages/MNIST%20handwritten%20digits.png)
+![10 examples of the handwritten digits from the MNIST dataset](MNIST handwritten digits.png)
 
 It is apparent how diverse handwritten numbers can be.  Sometimes zeros look like sixes, and sometimes fives look like an $s$.  In the next few steps, models will be developed and we can see how they handle the handwritten numbers.
 
