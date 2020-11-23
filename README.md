@@ -1,4 +1,4 @@
-## An Introduction to Digit Classification with MNIST 
+## An Introduction to Digit Image Classification with MNIST 
 November 22, 2020
 
 ### Table of Contents
@@ -12,7 +12,7 @@ November 22, 2020
 
 ### Introduction
 
-In this tutorial, we will introduce the MNIST dataset and show how to use K-Nearest Neighbors (KNN), Naive Bayes, and Logisitic Regression to classify images as digits.
+In this tutorial, we will introduce the MNIST dataset and show how to use K-Nearest Neighbors (KNN) and Naive Bayes to classify images as digits.
 
 The inference problem is:
 
@@ -58,7 +58,7 @@ np.random.seed(0)
 ```
 
 Next the dataset is loaded and prepared for modeling in three ways: (1) scale down the greyscale, (2) shuffle the dataset, and (3) split into train, test, and dev.
-
+A mini_train_data and mini_train_labels dataset is also created to reduce operating time in some of the data exploration.  In total, there are 70,000 examples or rows of data and each example contains 784 columns of pixel values that represent the image.
 
 ```python
 # Load the digit data from https://www.openml.org/d/554 or from default local location '~/scikit_learn_data/...'
@@ -83,7 +83,12 @@ train_data, train_labels = X[:60000], Y[:60000]
 mini_train_data, mini_train_labels = X[:1000], Y[:1000]
 ```
 
-To get a sense of the dataset, the handwritten digit images are visualized with the imshow() function.  
+```python
+data shape:  (70000, 784)
+label shape: (70000,)
+```
+
+To get a sense of the dataset, the handwritten digit images are visualized with the imshow() function.  Ten images are randomly choosen from each digit in the mini_train_data set.  Recall that each sample contains 784 columns of pixel values or features and if reshaped to 28x28 grid, would form an image.
 
 ```python
 examples = 10
@@ -104,6 +109,32 @@ for i in range(examples):
 ```
 
 ![10 examples of the handwritten digits from the MNIST dataset](https://github.com/sli0111/MNIST/blob/gh-pages/MNIST%20handwritten%20digits.png)
+
+It is apparent how diverse handwritten numbers can be.  Sometimes zeros look like sixes, and sometimes fives look like an $s$.  In the next few steps, models will be developed and we can see how they handle the handwritten numbers.
+
+First we will model the MNIST dataset with KNN.  The model will be evaluated based on the accuracy of the predictions against mini_train_labels.  In addition, we will look at how the number of k values, the training size, and Gaussian blur can affect the model performance.
+
+The following script builds the KNN model, increments through a few different values of k, and plots the accuracy.  The KNN model is built using the KNeighborsClassifier() function from the sklearn library and by default, uses the Minkowski distance metric.  Recall the MNIST dataset contains 784 pixel values.  At inference time, each test example containing 784 pixel values are compared to labeld training examples and test examples are classified based on their shortest Minkowski distance to the labedl training example.  It is apparent from the accuracy vs k neighbors plot that increasing the number k neighbors resulted in a loss of accuracy and overfitting.  In the following examples, we will continue with k=1.
+
+```python
+# Build KNN model
+target_names = np.unique(mini_train_labels)
+k_values = [1, 3, 5, 7, 9]
+model_accuracy = []
+for k in k_values:
+    target_names = np.unique(mini_train_labels)
+    model = KNeighborsClassifier(n_neighbors = k)
+    model.fit(mini_train_data, mini_train_labels)
+    predicted_labels = model.predict(dev_data)
+    model_accuracy = classification_report(y_true=dev_labels, y_pred=predicted_labels,  # Get the accuracy for each k
+                          target_names=target_names, output_dict=True)['accuracy']
+
+# Plot results
+plt.plot(k_values, model_accuracy)
+plt.xlabel('k')
+plt.ylabel('model accuracy')
+```
+![Model Accuracy vs K neighbors](knn_accuracy.png)
 
 
 
