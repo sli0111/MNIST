@@ -6,35 +6,45 @@ November 22, 2020
 * Introduction
 * What is the MNIST dataset?
 * A Quick Review of KNN
-* Digit Classification in Code and Three techniques to improve KNN 
+* Digit Classification in Code and Three techniques to Improve KNN 
 * Summary
 
 ### Introduction
 
-In this tutorial, we will introduce the MNIST dataset and show how to use K-Nearest Neighbors (KNN) and Naive Bayes to classify images as digits.
+In this tutorial, we introduce the MNIST dataset and show how to use K-Nearest Neighbors (KNN) to classify images of handwritten digits.
 
-The inference problem is:
+The inference problem <img src="https://render.githubusercontent.com/render/math?math=X = y(x))"> is:
 
-* given handwritten images of vector X
-* classify the images as digits between 0-9 as y
-
-<img src="https://render.githubusercontent.com/render/math?math=X = y(x))">
+* X = an array of pixels that represent images of handwritten digits
+* y = a corresponding array of labels classifying the handwritten digit as 0-9
 
 ### What is MNIST dataset? 
 
-MNIST is a large dataset of handwritten images often used for image processing models.  The dataset contains over 60,000 images of 28x28 pixels.  
-
-![dfd](https://en.wikipedia.org/wiki/MNIST_database#/media/File:MnistExamples.png)
-
+MNIST is a large dataset of handwritten images of digits collected by the National Institute of Standards and Technologies and is often used for training image processing models.  The dataset contains over 60,000 images of 28x28 pixels or a total of 784 pixel values for each example.   With convolution nets, error rates of < 0.25% have been achieved [1].  With KNN, error rates are between 0.5 to 5%.  This guide will attempt to apply KNN to this image classification problem.
 
 ### A Quick Review of KNN
 
+KNN or K-Nearest Neighbors is a type of supervised learning that is non-parametric, requires no training, but has a high memory and inference time cost.  Given the model's high inference time cost, it is often used to develop a baseline for more complex models.
 
+The KNN algorithm works by comparing new datasets with those the model was fitted on.  The comparison is operated using a distance metric.  In two dimensions, a distance metric would the length of a line between two points, or the famour Pythagorean Theorem.  
 
+If L is the distance metric and X = (x_1, x_2) are two points on a 2-D plane, then L is defined as:
+
+<img src="https://render.githubusercontent.com/render/math?math=L = |x_1, x_2|">
+
+In higher dimensions, the distance metric is generalized to a term called the L-norm and is written as:
+
+<img src="https://render.githubusercontent.com/render/math?math=L^n = \sqrt(x_1^2 - x_2^2)">
+
+When n=2, the L-norm is when we have two features X = (X1, X2) as presented above.
+
+Once the distance metrics are calculated, the a new datapoint is classified based on the label of the nearest neighbor(s) or training data that is the closest.  The k in the KNN thus represents the shortest distance between k neighbors instead of just 1 for example.
 
 ### Digit Classification in Code
 
-We'll start off by loading the neccesary libraries.  
+In this next section, KNN models are built and tested on MNIST dataset.
+
+We'll start off by loading the neccesary libraries.  The KNN models will be built using KNeighborsClassifier from sklearn library [2].
 
 ```python
 import time
@@ -50,7 +60,7 @@ np.random.seed(0)
 ```
 
 Next the dataset is loaded and prepared for modeling in three ways: (1) scale down the greyscale, (2) shuffle the dataset, and (3) split into train, test, and dev.
-A mini_train_data and mini_train_labels dataset is also created to reduce operating time in some of the data exploration.  In total, there are 70,000 examples or rows of data and each example contains 784 columns of pixel values that represent the image.
+A mini_train_data and mini_train_labels dataset are created to reduce operating time in demonstrating how to build the models.  In total, there are 70,000 examples or rows of data and each example contains 784 columns of pixel values that represent the image.
 
 ```python
 # Load the digit data from https://www.openml.org/d/554 or from default local location '~/scikit_learn_data/...'
@@ -91,9 +101,9 @@ plt.rc('image', cmap='gray')
 # Plots the first 10 digits from the mini_train_data set
 for i in range(examples):
     for j in range(digits) :
-        num_match = mini_train_data[mini_train_labels == str(j)]  # Select data for each digit
-        num = num_match[np.random.randint(len(num_match))]        # Randomly select examples from the data
-        num_image = np.reshape(num, (28,28))                      # Reshape 784 colums to 28x28
+        num_match = mini_train_data[mini_train_labels == str(j)]  
+        num = num_match[np.random.randint(len(num_match))]        
+        num_image = np.reshape(num, (28,28))                      
         
         # Plots the images of each example for each digit
         axs[j][i].imshow(num_image)
@@ -102,11 +112,9 @@ for i in range(examples):
 
 ![10 examples of the handwritten digits from the MNIST dataset](MNIST handwritten digits.png)
 
-It is apparent how diverse handwritten numbers can be.  Sometimes zeros look like sixes, and sometimes fives look like an $s$.  In the next few steps, models will be developed and we can see how they handle the handwritten numbers.
+It is apparent how diverse handwritten digits can be.  Sometimes zeros look like sixes, and sometimes fives look like a letter s.  In the next few steps, models will be developed and we can see how they handle the handwritten numbers.  Specifically, three techniques will be tested to improve the accuracy of the KNN models: examining the hyper parameter k, changing the training size, and applying an image processing technique Gaussian Blur.
 
-First we will model the MNIST dataset with KNN.  The model will be evaluated based on the accuracy of the predictions against mini_train_labels.  In addition, we will look at how the number of k values, the training size, and Gaussian blur can affect the model performance.
-
-The following script builds the KNN model, increments through a few different values of k, and plots the accuracy.  The KNN model is built using the KNeighborsClassifier() function from the sklearn library and by default, uses the Minkowski distance metric.  Recall the MNIST dataset contains 784 pixel values.  At inference time, each test example containing 784 pixel values are compared to labeld training examples and test examples are classified based on their shortest Minkowski distance to the labedl training example.  It is apparent from the accuracy vs k neighbors plot that increasing the number k neighbors resulted in a loss of accuracy and overfitting.  In the following examples, we will continue with k=1.
+The first KNN models are built around different hyper parameters k, or the number of nearest neighbors.  The following script builds give KNN models, each with a different value for k.  The accuracies are then stored and plotted against the number of k.  It is apparent from the accuracy vs k neighbors plot that increasing the number k neighbors resulted in a loss of accuracy and overfitting.  In the following examples, we will continue with k=1.
 
 ```python
 # Build KNN model
@@ -186,7 +194,7 @@ for j in incorrect_prediction:
 
 Manipulating the hyperparameter k is one way to improve the accuracy of KNN and another way is increasing the amount of training data.  More training data gives the model more comparisons with the distance metric and should provide more accurate predictions.  A drawback however, is that there are more computations to perform.  Thus, KNN is model that requires no fitting time but a significantly computational inference time.
 
-The following script explores accuracy vs training sizes from 100 to 25,600 rows of data.  It also record the amount of time it takes perform inference on the dev set.  From the plots, the accuracy begins to plateu at 10,000 examples while the inference time contains to increase linearly - a clear situation of diminishing returns.  
+A second set of KNN models are built in the following script and explores accuracy vs training sizes from 100 to 25,600 rows of data.  It also records the amount of time it takes perform inference on the dev set.  From the plots, the accuracy begins to plateu at 10,000 examples while the inference time contains to increase linearly - a clear situation of diminishing returns.  
 
 ```python
 # Initialize subplots and the list of train sizes
@@ -236,9 +244,9 @@ plt.show
 
 ![accuracy vs train size and inference time](knn train size.png)
 
-Since high computational inference times are often inhibitive in practice, another technique to improve accuracy is Gaussian Blur.  Gaussian Blue is an common image processing technique that smooths an image by blurring.  The idea is that a value of a particular pixel is a weighted average of the pixels around it.  The weight of surrounding pixels on the particular pixel is determined by the Gaussian function (mean and variance).  Ultimately, the technique reduces the complexity of the images and very localized variance and generalizes the model.
+Since high computational inference times are often inhibitive in practice, the last technique we will apply to improve accuracy is Gaussian Blur.  Gaussian Blue is an common image processing technique that smooths an image by blurring.  The idea is that a value of a particular pixel is a weighted average of the pixels around it.  The weight of surrounding pixels on the particular pixel is determined by the Gaussian function (mean and variance).  Ultimately, the technique reduces the complexity of the images and generalizes the model.
 
-The script below builts a function called gaussian_blur which averages the 8 neighboring pixels and assigns that value to the particular pixel.  Two KNN models are then produced, one for the raw dataset and another for the transformed train dataset.  From the results, we can see the the accuracy of the now has now increased to 91%.
+In the third set of KNN models, the script below builts a function called gaussian_blur which averages the 8 neighboring pixels and assigns that value to the particular pixel.  Two KNN models are then produced, one for the raw dataset and another for the transformed train dataset.  From the results, we can see the the accuracy of the now has now increased to 91%.  Thus we were able improve accuracy despite reducing complexity.
 
 ```python
 def gaussian_blur(data):
@@ -282,7 +290,7 @@ ax2.imshow(gb_mini_train_data[0].reshape(28, 28))
 ax2.set_title("Filtered - average pixels")
 plt.show
 
-# Peform kNN for the 4 scenarios for k=1
+# Peform kNN for the 2 scenarios for k=1
 
 KNN_0 = KNeighborsClassifier(n_neighbors = 1)
 model_0 = KNN_0.fit(mini_train_data, mini_train_labels)
@@ -291,14 +299,6 @@ accuracy_0 = model_0.score(dev_data, dev_labels)
 KNN_1 = KNeighborsClassifier(n_neighbors = 1)
 model_1 = KNN_1.fit(gb_mini_train_data, mini_train_labels)
 accuracy_1 = model_1.score(dev_data, dev_labels)
-
-KNN_2 = KNeighborsClassifier(n_neighbors = 1)
-model_2 = KNN_2.fit(mini_train_data, mini_train_labels)
-accuracy_2 = model_2.score(gb_dev_data, dev_labels)
-
-KNN_3 = KNeighborsClassifier(n_neighbors = 1)
-model_3 = KNN_3.fit(gb_mini_train_data, mini_train_labels)
-accuracy_3 = model_3.score(gb_dev_data, dev_labels)
 
 print("No Filter Train, No Filter Dev: %0.2f" %accuracy_0)
 print("Filter Train, No Filter Dev: %0.2f" %accuracy_1)
@@ -316,7 +316,8 @@ Filter Train, No Filter Dev: 0.91
 In this guide, we looked at the MNIST handwritten digit dataset and how we could apply a K-Nearest Neighbors classification from sklearn library to classify the digit images.  Out of the box, KNN produced an accuracy of 88% with k=1 and increasing k did not improve model performance.  We increased the training set size for the KNN model and saw increased accuracy but it was at the cost of a high computational inference time.  Instead, applying an image processing technique called Gaussian Blur generalized the model and improved model accuracy to 91% with little cost.  
 
 ### References
-[KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html)
+1. [The MNIST Database](http://yann.lecun.com/exdb/mnist/)
+2. [KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html)
 
 
 
